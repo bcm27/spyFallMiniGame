@@ -20,3 +20,19 @@
 #       b: at the end of each round; the server asks the spy client if they would like to guess   #
 #          the location that we are at. If they guess correctly. They win the game.               #
 ###################################################################################################
+
+print("hello world")
+#   2: each connection will be threaded for asycronouse connection handling
+#      on a udp server
+#   3: client security is handled using a jtw token authentication method
+
+# other functions
+#   1: sendUserCards
+#   2: send end of game confirmation
+#   3: send out user start game confirmation
+
+# other variables or data 
+#   1: start server with config.json
+#   2: threaded each client connection to have asycronous connections 
+
+# 

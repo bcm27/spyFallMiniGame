@@ -50,6 +50,7 @@ class messageObject:
         return self.message
 
 def main():
+    print("Server Startup for SpyFall Version 0.0.1")
     # start up server and call the listen function with a graceful exit at the end
 
 def listenToClient(client_socket, client_address):
@@ -64,3 +65,6 @@ def sendEndGameSignal():
 
 def sendNextTurnToClient(client_socket, client_address):
     # sends an individual client a indicator that its a next turn
+
+if __name__ == "__main__":
+    main()

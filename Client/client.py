@@ -17,3 +17,13 @@
 #       4: next round incoming message
 #       5: send room assignment to server
 
+def main():
+    print("Starting Client GUI")
+
+    # thread each gui window
+    # launch the joinRoomGUI.py
+    # after they choose a room we launch the gameGUI.py
+    # depending on the state of the game we can display either the endGameGUI or cardDisplayGUI, etc.
+
+def if __name__ == "__main__":
+    main()

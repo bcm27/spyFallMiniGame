@@ -21,7 +21,6 @@
 #          the location that we are at. If they guess correctly. They win the game.               #
 ###################################################################################################
 
-print("hello world")
 #   2: each connection will be threaded for asycronouse connection handling
 #      on a udp server
 #   3: client security is handled using a jtw token authentication method
@@ -35,4 +34,33 @@ print("hello world")
 #   1: start server with config.json
 #   2: threaded each client connection to have asycronous connections 
 
-# 
+class messageObject: 
+    def __init__(self, sender, recipient, message):
+        self.sender = sender
+        self.recipient = recipient
+        self.message = message
+
+    def getSender(self):
+        return self.sender
+
+    def getRecipient(self):
+        return self.recipient
+
+    def getMessage(self):
+        return self.message
+
+def main():
+    # start up server and call the listen function with a graceful exit at the end
+
+def listenToClient(client_socket, client_address):
+    # listen to the client for messages and handle accordingly 
+    # has authentication built in
+
+def sendTotalUserList():
+    # send each user a list of all the players in play
+
+def sendEndGameSignal():
+    # sends the end game signal to all clients 
+
+def sendNextTurnToClient(client_socket, client_address):
+    # sends an individual client a indicator that its a next turn

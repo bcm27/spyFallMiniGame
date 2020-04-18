@@ -34,6 +34,10 @@
 #   1: start server with config.json
 #   2: threaded each client connection to have asycronous connections 
 
+from socket import *
+from threading import Thread
+import time
+
 class messageObject: 
     def __init__(self, sender, recipient, message):
         self.sender = sender
@@ -50,8 +54,39 @@ class messageObject:
         return self.message
 
 def main():
-    print("Server Startup for SpyFall Version 0.0.1")
-    # start up server and call the listen function with a graceful exit at the end
+    print("Server for SpyFall Version 0.0.1")
+
+    # Variable pool
+    global server_socket
+    SERVER_PORT = 5003
+
+    try:
+        cls()
+        print("Starting..")
+
+        server_socket = socket(AF_INET, SOCK_STREAM) # TCP server
+        server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR)
+        server_socket.bind(("", SERVER_PORT)) # bind to localhost serverport
+
+        while True:
+            print("Waiting for a connection...")
+            client_socket = None
+            try:
+                client_socket, client_address = server_socket.accept()
+                #start the thread
+                Thread(target=listenToClient, args=[client_socket, client_address]).start()
+            print("Connection acquired: {0}".format(str(client_address)))  # Notify a connection was made
+    except KeyboardInterrupt:
+        pass
+    except Exception as e:
+        cls()
+        print(e)
+        exit(-1)
+    finally:
+        cls()
+        server_socket.close()
+        print("Server for SpyFall Version 0.0.01 has closed..")
+        exit(0) # close gracefully
 
 def listenToClient(client_socket, client_address):
     # listen to the client for messages and handle accordingly 

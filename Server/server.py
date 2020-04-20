@@ -34,6 +34,7 @@
 #   1: start server with config.json
 #   2: threaded each client connection to have asycronous connections 
 
+import os
 from socket import *
 from threading import Thread
 import time
@@ -61,44 +62,50 @@ def main():
     SERVER_PORT = 5003
 
     try:
-        cls()
-        print("Starting..")
 
         server_socket = socket(AF_INET, SOCK_STREAM) # TCP server
-        server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR)
+        server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         server_socket.bind(("", SERVER_PORT)) # bind to localhost serverport
+        server_socket.listen(10)
 
         while True:
             print("Waiting for a connection...")
             client_socket = None
-            try:
+
+            try:                  
                 client_socket, client_address = server_socket.accept()
-                #start the thread
                 Thread(target=listenToClient, args=[client_socket, client_address]).start()
+            except KeyboardInterrupt:
+                if client_socket:
+                    client_socket.close()
+                break                
             print("Connection acquired: {0}".format(str(client_address)))  # Notify a connection was made
+            
     except KeyboardInterrupt:
         pass
     except Exception as e:
-        cls()
-        print(e)
-        exit(-1)
+        print(e)  # Print the error
+        exit(-1)  # Close
     finally:
-        cls()
-        server_socket.close()
-        print("Server for SpyFall Version 0.0.01 has closed..")
-        exit(0) # close gracefully
+        server_socket.close()  # Close the server socket
+        print('SpyFall Server cleanup and exiting...done!')
+        exit(0)  # Close
 
 def listenToClient(client_socket, client_address):
+    print("Server Connected")
     # listen to the client for messages and handle accordingly 
     # has authentication built in
 
 def sendTotalUserList():
+    print("")
     # send each user a list of all the players in play
 
 def sendEndGameSignal():
+    print("")
     # sends the end game signal to all clients 
 
 def sendNextTurnToClient(client_socket, client_address):
+    print("")
     # sends an individual client a indicator that its a next turn
 
 if __name__ == "__main__":

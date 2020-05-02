@@ -34,10 +34,16 @@
 #   1: start server with config.json
 #   2: threaded each client connection to have asycronous connections 
 
-import os
-from socket import *
+import re # regular expressions 
+import time # 
 from threading import Thread
-import time
+from socket import * # networking
+
+# personal files
+import sUtils
+
+CONNECTED_CLIENTS = []
+arrayOfStoredMessages = []
 
 class messageObject: 
     def __init__(self, sender, recipient, message):
@@ -66,9 +72,10 @@ def main():
         server_socket = socket(AF_INET, SOCK_STREAM) # TCP server
         server_socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         server_socket.bind(("", SERVER_PORT)) # bind to localhost serverport
-        server_socket.listen(10)
+        server_socket.listen(12) # max number of clients that can listen at once
 
         while True:
+            sUtils.cls()
             print("Waiting for a connection...")
             client_socket = None
 
@@ -81,22 +88,64 @@ def main():
                 break                
             print("Connection acquired: {0}".format(str(client_address)))  # Notify a connection was made
             
-    except KeyboardInterrupt:
-        pass
     except Exception as e:
         print(e)  # Print the error
-        exit(-1)  # Close
+        exit(-1) 
     finally:
         server_socket.close()  # Close the server socket
         print('SpyFall Server cleanup and exiting...done!')
-        exit(0)  # Close
+        exit(0)
 
 def listenToClient(client_socket, client_address):
     print("Server Connected")
-    # listen to the client for messages and handle accordingly 
-    # has authentication built in
+    
+    while True:
+        try:
+            data = client_socket.recv(1024)
 
-def sendTotalUserList():
+            if data is not None:
+                requests = re.split(" +", data.decode())
+
+                if requests is not None:
+                    
+                    def get_jwt(req):
+                            if req[0] == '/login':  # `/login username hashed_pass_here`
+                                return DBMethods.login(req[1], req[2])
+
+                            elif req[0] == '/register':  # `/register username hashed_pass_here`
+                                if DBMethods.register(req[1], req[2]):
+                                    return DBMethods.login(req[1], req[2])
+
+                            elif req[0] == '/verify':  # `/verify jwt.code.here`
+                                if sUtils.decodeJWT(req[1]) is not None:
+                                    return req[1]
+
+                    jwt = get_jwt(requests)
+
+                    if jwt is not None:
+                        # processing whats inside the jwt
+
+                        decoded_jwt = sUtils.decodeJWT(jwt)
+
+                        username = decoded_jwt.get('username') 
+                        client_dic = {username: client_socket}  # Dictionary of `key:username` and `value:socket`
+
+                        CONNECTED_CLIENTS.append(
+                            client_dic)  # Add the client dictionary to the list of connected client
+                        client_socket.send(bytes("<ACCEPTED>", "UTF-8"))
+
+                        updateUserLists() # notify all other clients that the new client is connected 
+                else:
+                    client_socket.send(bytes("<DECLINED>", "UTF-8"))
+            else:
+                client_socket.send(bytes("<DECLINED>", "UTF-8"))
+        except Exception as e:
+            print(e)
+            print("Client disconnected")
+            client_socket.close()
+            return False
+
+def updateUserLists():
     print("")
     # send each user a list of all the players in play
 
